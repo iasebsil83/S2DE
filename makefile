@@ -1,5 +1,5 @@
 exe: prog.o S2DE.o
-	gcc -Wall -o exe prog.o S2DE.o -lm -lglut -lGL -lX11
+	gcc -Wall -o run prog.o S2DE.o -lm -lglut -lGL -lX11
 	rm -f *.o
 
 
