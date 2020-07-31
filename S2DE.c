@@ -91,7 +91,7 @@
 
 //global vars
 static int S2DE_window = -1;
-static int S2DE_timedExecution_delay = -1; //volatile ?
+static int S2DE_timedExecution_delay = -1;
 
 
 
