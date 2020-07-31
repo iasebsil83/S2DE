@@ -58,6 +58,14 @@
 const int maxl = 700;	const int maxl_2 = 350;
 const int maxh = 700;	const int maxh_2 = 350;
 
+// ---- hashed images ----
+int littleH_width  = 250;
+int littleH_height = 120;
+int* littleH_data = NULL;
+int bigH_width  = 50;
+int bigH_height = 300;
+int* bigH_data = NULL;
+
 
 
 
@@ -88,6 +96,20 @@ void S2DE_display(){
 	//red unfilled rectangle at the top right corner
 	S2DE_setColor(255,  0,  0);
 	S2DE_rectangle(maxl-100,maxh-100, maxl-200,maxh-200, 0);
+
+	//littleH
+	S2DE_imageRGBA(
+		maxl_2,maxh_2,
+		littleH_width,littleH_height,
+		littleH_data
+	);
+
+	//bigH
+	S2DE_imageRGBA(
+		maxl_2/2,maxh_2,
+		bigH_width,bigH_height,
+		bigH_data
+	);
 }
 
 void S2DE_keyPressed(char key){
@@ -138,6 +160,27 @@ void S2DE_reshape(int newWidth,int newHeight){
 
 // ---- main ----
 int main(int argc, char **argv){
+
+	//creating littleH
+	littleH_data = malloc(littleH_width*littleH_height*4); //RGBA => 4 bytes per pixel
+	unsigned char blink;
+	int index=0;
+	for(int y=0; y < littleH_height; y++){
+		for(int x=0; x < littleH_width; x++){
+			blink = (x+y)%8 ? 255 : 0;
+			littleH_data[index++] = S2DE_setPixelRGBA(blink, blink, blink, 255);
+		}
+	}
+
+	//creating bigH
+	bigH_data = malloc(bigH_width*bigH_height*4); //RGBA => 4 bytes per pixel
+	index=0;
+	for(int y=0; y < bigH_height; y++){
+		for(int x=0; x < bigH_width; x++){
+			blink = (x+y)%16 ? 255 : 0;
+			bigH_data[index++] = S2DE_setPixelRGBA(blink, blink, 255, 255);
+		}
+	}
 
 	//init S2DE
 	S2DE_init(argc,argv, "Program Name [V.V.V]", maxl,maxh);

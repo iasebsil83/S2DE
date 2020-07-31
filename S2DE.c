@@ -35,7 +35,7 @@
 
 
 
-/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ S2DE [0.1.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ S2DE [0.1.1] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                         Simple 2Dimensional Engine
 
     Developped using freeglut3 (or just GLUT), a graphical 2D/3D engine.
@@ -61,6 +61,10 @@
 
     16/07/2020 > [0.1.0] :
     - Creating the whole engine (functions, constants and default program).
+
+    31/07/2020 > [0.1.1] :
+    - Added S2DE_imageRGBA() (data must be in RGBA format, 4 bytes per pixel).
+    - Added S2DE_setPixelRGBA(). Useful to create images manually.
 
     BUGS : .
     NOTES : .
@@ -387,6 +391,18 @@ void S2DE_text(char* text, float size, float x,float y){
 	while(*text)
 		glutStrokeCharacter(GLUT_STROKE_ROMAN, *text++);
 	glPopMatrix();
+}
+
+
+
+//images
+void S2DE_imageRGBA(int x,int y, int width,int height, int* data){
+	glRasterPos2i(x,y);
+	glDrawPixels(width,height, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, data);
+}
+
+int S2DE_setPixelRGBA(unsigned char r, unsigned char g, unsigned char b, unsigned char a){
+	return (r << 24) + (g << 16) + (b <<  8) + a;
 }
 
 

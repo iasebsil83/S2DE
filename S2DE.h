@@ -50,7 +50,7 @@ enum S2DE_MOUSE{
 
 
 
-//// ---------------- UTILITIES ----------------
+// ---------------- UTILITIES ----------------
 
 //useful
 void S2DE_refresh();
@@ -67,6 +67,10 @@ void S2DE_quad(float x1,float y1, float x2,float y2, float x3,float y3, float x4
 
 //text
 void S2DE_text(char* text, float size, float x,float y);
+
+//images
+void S2DE_imageRGBA(int x,int y, int width,int height, int* data);
+int S2DE_setPixelRGBA(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
 
 //timed executions
 void S2DE_setTimedExecution(int ms);
