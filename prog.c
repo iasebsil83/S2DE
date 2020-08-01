@@ -187,7 +187,7 @@ int main(int argc, char **argv){
 	S2DE_setTimedExecution(100);
 
 	//launch S2DE
-	printf("Starting S2DE [0.1.0]\n");
+	printf("Starting S2DE [0.1.1]\n");
 	S2DE_start();
 
 	return 0;
