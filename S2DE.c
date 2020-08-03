@@ -35,7 +35,7 @@
 
 
 
-/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ S2DE [0.1.1] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ S2DE [0.1.2] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                         Simple 2Dimensional Engine
 
     Developped using freeglut3 (or just GLUT), a graphical 2D/3D engine.
@@ -65,6 +65,9 @@
     31/07/2020 > [0.1.1] :
     - Added S2DE_imageRGBA() (data must be in RGBA format, 4 bytes per pixel).
     - Added S2DE_setPixelRGBA(). Useful to create images manually.
+
+    03/08/2020 > [0.1.2] :
+    - Added error messages in S2DE_text() and S2DE_init().
 
     BUGS : .
     NOTES : .
@@ -387,6 +390,13 @@ void S2DE_text(char* text, float size, float x,float y){
 	glTranslatef(x,y,0);
 	glScalef(size,size,size);
 
+	//error case
+	if(text == NULL){
+		printf("RUNTIME ERROR > S2DE.c : S2DE_text() : ");
+		printf("Text is NULL.\n");
+		return;
+	}
+
 	//write text character per character
 	while(*text)
 		glutStrokeCharacter(GLUT_STROKE_ROMAN, *text++);
@@ -435,6 +445,13 @@ void S2DE_setTimedExecution(int ms){
 
 //init
 void S2DE_init(int argc, char** argv, const char* name, int width,int height){
+	//error case
+	if(name == NULL){
+		printf("RUNTIME ERROR > S2DE.c : S2DE_init() : ");
+		printf("Cannot init window, name is NULL.\n");
+		return;
+	}
+
 	//compatibility
 	#ifdef __linux__
 		int majOGL;
