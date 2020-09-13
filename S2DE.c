@@ -1,23 +1,17 @@
 // ---------------- IMPORTATIONS ----------------
 
-//compatibility
-#ifdef __APPLE__
-	#include <OpenGL/gl.h>
-	#include <OpenGL/CGLMacro.h>
-	#include <GLUT/glut.h>		// Header File For The GLut Library
-#else
-	#include <glut.h>			// Header File For The GLut Library
-	#include <X11/Xlib.h>
-	#include <GL/glx.h>
-#endif
-
-
-
 //standard
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
-#include <string.h>
+
+
+
+//graphic engine
+#ifdef __APPLE__
+	#include <GLUT/glut.h>
+#else
+	#include <glut.h>
+#endif
 
 
 
@@ -69,8 +63,15 @@
     03/08/2020 > [0.1.2] :
     - Added error messages in S2DE_text() and S2DE_init().
 
-    BUGS : .
-    NOTES : .
+    10/09/2020 > [0.1.3] :
+    - Changed event handling system : Passed from one function per event type
+      to only one function with event id.
+    - Remapped all keyboard keys.
+    - Added detection of released events.
+    - Removed unecessary libraries.
+
+    BUGS : Unrendered line appeared in diagonal from bottom left to right corners.
+    NOTES : Patched unrendered line.
 
     Contact     : i.a.sebsil83@gmail.com
     Youtube     : https://www.youtube.com/user/IAsebsil83
@@ -92,19 +93,24 @@
 
 // ---------------- INITIALIZATION ----------------
 
-//global vars
+//window
 static int S2DE_window = -1;
 static int S2DE_timedExecution_delay = -1;
 
+//event variables
+int S2DE_mouseState  = 0; //mouse
+int S2DE_mouseButton = 0;
+int S2DE_mouseX      = 0;
+int S2DE_mouseY      = 0;
+int S2DE_keyState       = 0; //keyboard
+unsigned short S2DE_key = 0;
+int S2DE_newWidth  = 0; //resize
+int S2DE_newHeight = 0;
 
 
-//event handlers
-extern void S2DE_timedExecution();
-extern void S2DE_display();
-extern void S2DE_keyPressed(char key);
-extern void S2DE_mousePressed(int x,int y, int state);
-extern void S2DE_mouseMoved(int x,int y);
-extern void S2DE_reshape(int newWidth,int newHeight);
+
+//event handler
+extern void S2DE_event(int event);
 
 
 
@@ -130,7 +136,7 @@ static void S2DEL_timedExecution(int i){
 				S2DEL_timedExecution,
 				S2DE_timedExecution_delay
 			);
-			S2DE_timedExecution();
+			S2DE_event(S2DE_TIMER);
 		}
 	}
 }
@@ -140,9 +146,9 @@ static void S2DEL_timedExecution(int i){
 //display
 static void S2DEL_display(){
 	glFlush();
-	glClearColor(0.f,0.f,0.f,0.f);
+	glClearColor(1.f, 1.f, 1.f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	S2DE_display();
+	S2DE_event(S2DE_DISPLAY);
 	glutSwapBuffers();
 }
 
@@ -150,130 +156,44 @@ static void S2DEL_display(){
 
 //keyboard
 static void S2DEL_keyPressed(GLubyte g, int x,int y){
-	char c = (char)g;
-	switch(c){
-		case 8:
-			S2DE_keyPressed(S2DE_KEY_BACKSPACE);
-		break;
-		case 9:
-			S2DE_keyPressed(S2DE_KEY_TAB);
-		break;
-		case 13:
-			S2DE_keyPressed(S2DE_KEY_ENTER);
-		break;
-		case 27:
-			S2DE_keyPressed(S2DE_KEY_ESCAPE);
-		break;
-		case 127:
-			S2DE_keyPressed(S2DE_KEY_DELETE);
-		break;
-		default:
-			S2DE_keyPressed(c);
-	}
+	S2DE_key = g;
+	S2DE_keyState = S2DE_KEY_PRESSED;
+	S2DE_event(S2DE_KEYBOARD);
 }
 
 static void S2DEL_keyPressed_special(int keyCode, int x,int y){
-	switch(keyCode){
-		case GLUT_KEY_F1:
-			S2DE_keyPressed(S2DE_KEY_F1);
-		break;
-		case GLUT_KEY_F2:
-			S2DE_keyPressed(S2DE_KEY_F2);
-		break;
-		case GLUT_KEY_F3:
-			S2DE_keyPressed(S2DE_KEY_F3);
-		break;
-		case GLUT_KEY_F4:
-			S2DE_keyPressed(S2DE_KEY_F4);
-		break;
-		case GLUT_KEY_F5:
-			S2DE_keyPressed(S2DE_KEY_F5);
-		break;
-		case GLUT_KEY_F6:
-			S2DE_keyPressed(S2DE_KEY_F6);
-		break;
-		case GLUT_KEY_F7:
-			S2DE_keyPressed(S2DE_KEY_F7);
-		break;
-		case GLUT_KEY_F8:
-			S2DE_keyPressed(S2DE_KEY_F8);
-		break;
-		case GLUT_KEY_F9:
-			S2DE_keyPressed(S2DE_KEY_F9);
-		break;
-		case GLUT_KEY_F10:
-			S2DE_keyPressed(S2DE_KEY_F10);
-		break;
-		case GLUT_KEY_F11:
-			S2DE_keyPressed(S2DE_KEY_F11);
-		break;
-		case GLUT_KEY_F12:
-			S2DE_keyPressed(S2DE_KEY_F12);
-		break;
-		case GLUT_KEY_UP:
-			S2DE_keyPressed(S2DE_KEY_UP);
-		break;
-		case GLUT_KEY_DOWN:
-			S2DE_keyPressed(S2DE_KEY_DOWN);
-		break;
-		case GLUT_KEY_LEFT:
-			S2DE_keyPressed(S2DE_KEY_LEFT);
-		break;
-		case GLUT_KEY_RIGHT:
-			S2DE_keyPressed(S2DE_KEY_RIGHT);
-		break;
-		case GLUT_KEY_PAGE_UP:
-			S2DE_keyPressed(S2DE_KEY_PAGE_UP);
-		break;
-		case GLUT_KEY_PAGE_DOWN:
-			S2DE_keyPressed(S2DE_KEY_PAGE_DOWN);
-		break;
-		case GLUT_KEY_HOME:
-			S2DE_keyPressed(S2DE_KEY_HOME);
-		break;
-		case GLUT_KEY_END:
-			S2DE_keyPressed(S2DE_KEY_END);
-		break;
-		case GLUT_KEY_INSERT:
-			S2DE_keyPressed(S2DE_KEY_INSERT);
-		break;
-		default:
-			S2DE_keyPressed(S2DE_KEY_UNDEFINED);
-	}
+	S2DE_key = 256 + (unsigned char)keyCode;
+	S2DE_keyState = S2DE_KEY_PRESSED;
+	S2DE_event(S2DE_KEYBOARD);
+}
+
+static void S2DEL_keyReleased(GLubyte g, int x,int y){
+	S2DE_key = g;
+	S2DE_keyState = S2DE_KEY_RELEASED;
+	S2DE_event(S2DE_KEYBOARD);
+}
+
+static void S2DEL_keyReleased_special(int keyCode, int x,int y){
+	S2DE_key = 256 + (unsigned char)keyCode;
+	S2DE_keyState = S2DE_KEY_RELEASED;
+	S2DE_event(S2DE_KEYBOARD);
 }
 
 
 
 //mouse
-static void S2DEL_mousePressed(int button, int state, int x,int y){
-	switch(button){
-		case GLUT_LEFT_BUTTON:
-			if(state == GLUT_DOWN)
-				S2DE_mousePressed(x,y, S2DE_LEFT_PRESSED);
-			else
-				S2DE_mousePressed(x,y, S2DE_LEFT_RELEASED);
-		break;
-		case GLUT_MIDDLE_BUTTON:
-			if(state == GLUT_DOWN)
-				S2DE_mousePressed(x,y, S2DE_MIDDLE_PRESSED);
-			else
-				S2DE_mousePressed(x,y, S2DE_MIDDLE_RELEASED);
-		break;
-		case GLUT_RIGHT_BUTTON:
-			if(state == GLUT_DOWN)
-				S2DE_mousePressed(x,y, S2DE_RIGHT_PRESSED);
-			else
-				S2DE_mousePressed(x,y, S2DE_RIGHT_RELEASED);
-		break;
-	}
+static void S2DEL_mouseButton(int button, int state, int x,int y){
+	S2DE_mouseX = x;
+	S2DE_mouseY = y;
+	S2DE_mouseState = state;
+	S2DE_mouseButton = button;
+	S2DE_event(S2DE_MOUSECLICK);
 }
 
 static void S2DEL_mouseMoved(int x,int y){
-	S2DE_mouseMoved(x,y);
-}
-
-static void S2DEL_mouseMoved_passive(int x,int y){
-	S2DE_mouseMoved(x,y);
+	S2DE_mouseX = x;
+	S2DE_mouseY = y;
+	S2DE_event(S2DE_MOUSEMOVE);
 }
 
 
@@ -285,7 +205,9 @@ static void S2DEL_reshape(int width,int height){
 	glLoadIdentity();
 	glOrtho(0.f,(GLdouble)width, 0.f,(GLdouble)height, -1.f,1.f);
 	glMatrixMode(GL_MODELVIEW);
-	S2DE_reshape(width,height);
+	S2DE_newWidth  = width;
+	S2DE_newHeight = height;
+	S2DE_event(S2DE_RESIZE);
 }
 
 
@@ -418,7 +340,7 @@ int S2DE_setPixelRGBA(unsigned char r, unsigned char g, unsigned char b, unsigne
 
 
 //timed executions
-void S2DE_setTimedExecution(int ms){
+void S2DE_setTimer(int ms){
 	if(S2DE_timedExecution_delay < 0 && ms >= 0)
 		glutTimerFunc(
 			(unsigned int)ms,
@@ -452,17 +374,6 @@ void S2DE_init(int argc, char** argv, const char* name, int width,int height){
 		return;
 	}
 
-	//compatibility
-	#ifdef __linux__
-		int majOGL;
-		int minOGL;
-		Display *dsp = XOpenDisplay(NULL);
-		if(dsp != NULL){
-			glXQueryVersion(dsp, &majOGL, &minOGL);
-			XCloseDisplay(dsp);
-		}
-	#endif
-
 	//init window
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
@@ -483,22 +394,24 @@ void S2DE_init(int argc, char** argv, const char* name, int width,int height){
 	glEnable(GL_LINE_SMOOTH);
 	glEnable(GL_POLYGON_SMOOTH);
 	glEnable(GL_NORMALIZE);
+	glutSetKeyRepeat(GLUT_KEY_REPEAT_OFF);
+
+	//set local S2DE event handlers (S2DEL)
+	glutDisplayFunc      (S2DEL_display            );
+	glutKeyboardFunc     (S2DEL_keyPressed         );
+	glutSpecialFunc      (S2DEL_keyPressed_special );
+	glutKeyboardUpFunc   (S2DEL_keyReleased        );
+	glutSpecialUpFunc    (S2DEL_keyReleased_special);
+	glutMouseFunc        (S2DEL_mouseButton        );
+	glutMotionFunc       (S2DEL_mouseMoved         );
+	glutPassiveMotionFunc(S2DEL_mouseMoved         );
+	glutReshapeFunc      (S2DEL_reshape            );
 }
 
 
 
 //start - stop
 void S2DE_start(){
-	//set local S2DE event handlers (S2DEL)
-	glutDisplayFunc      (S2DEL_display           );
-	glutKeyboardFunc     (S2DEL_keyPressed        );
-	glutSpecialFunc      (S2DEL_keyPressed_special);
-	glutMouseFunc        (S2DEL_mousePressed      );
-	glutMotionFunc       (S2DEL_mouseMoved        );
-	glutPassiveMotionFunc(S2DEL_mouseMoved_passive);
-	glutReshapeFunc      (S2DEL_reshape           );
-
-	//launch event loop
 	glutMainLoop();
 }
 

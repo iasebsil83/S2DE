@@ -1,5 +1,5 @@
 run: prog.o S2DE.o
-	gcc -Wall -o run prog.o S2DE.o -lm -lglut -lGL -lX11
+	gcc -Wall -o run prog.o S2DE.o -lglut -lGL
 	rm -f *.o
 
 
