@@ -97,6 +97,8 @@
 static int S2DE_window = -1;
 static int S2DE_timedExecution_delay = -1;
 
+
+
 //event variables
 int S2DE_mouseState  = 0; //mouse
 int S2DE_mouseButton = 0;
