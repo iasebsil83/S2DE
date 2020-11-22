@@ -70,8 +70,11 @@
     - Added detection of released events.
     - Removed unecessary libraries.
 
-    BUGS : Unrendered line appeared in diagonal from bottom left to right corners.
-    NOTES : Patched unrendered line.
+    22/11/2020 > [0.1.4] :
+    - Fixed bug : diagonals appeared in rectangles and quads.
+
+    BUGS : .
+    NOTES : .
 
     Contact     : i.a.sebsil83@gmail.com
     Youtube     : https://www.youtube.com/user/IAsebsil83
@@ -281,6 +284,13 @@ void S2DE_rectangle(float x1,float y1, float x2,float y2, int filled){
 			glVertex2f(x2,y2);
 			glVertex2f(x1,y2);
 		glEnd();
+
+		//GPU weakness : remove diagonals
+		float thickness;
+		glGetFloatv(GL_LINE_WIDTH, &thickness);
+		glLineWidth(1.f);
+		S2DE_line(x1,y1, x2,y2);
+		glLineWidth(thickness);
 	}else{
 		S2DE_line(x1,y1, x2,y1);
 		S2DE_line(x2,y1, x2,y2);
@@ -297,6 +307,13 @@ void S2DE_quad(float x1,float y1, float x2,float y2, float x3,float y3, float x4
 			glVertex2f(x3,y3);
 			glVertex2f(x4,y4);
 		glEnd();
+
+		//GPU weakness : remove diagonals
+		float thickness;
+		glGetFloatv(GL_LINE_WIDTH, &thickness);
+		glLineWidth(1.f);
+		S2DE_line(x1,y1, x3,y3);
+		glLineWidth(thickness);
 	}else{
 		S2DE_line(x1,y1, x2,y2);
 		S2DE_line(x2,y2, x3,y3);
