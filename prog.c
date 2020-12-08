@@ -54,12 +54,6 @@
 
 // ---------------- DECLARATIONS ----------------
 
-// ---- window ----
-const int maxl = 700;	const int maxl_2 = 350;
-const int maxh = 700;	const int maxh_2 = 350;
-
-
-
 //event variables
 extern int S2DE_mouseState; //mouse
 extern int S2DE_mouseButton;
@@ -67,8 +61,10 @@ extern int S2DE_mouseX;
 extern int S2DE_mouseY;
 extern int S2DE_keyState; //keyboard
 extern short S2DE_key;
-extern int S2DE_newWidth; //resize
-extern int S2DE_newHeight;
+extern unsigned int S2DE_newWidth; //resize
+extern unsigned int S2DE_newHeight;
+extern unsigned int S2DE_width;
+extern unsigned int S2DE_height;
 
 
 
@@ -101,7 +97,7 @@ void S2DE_event(int event){
 		case S2DE_DISPLAY:
 			//background
 			S2DE_setColor(255,255,255);
-			S2DE_rectangle(0,0, maxl,maxh, 1);
+			S2DE_rectangle(0,0, S2DE_width,S2DE_height, 1);
 
 			//blue filled rectangle at the bottom left corner
 			S2DE_setColor(  0,  0,255);
@@ -109,19 +105,23 @@ void S2DE_event(int event){
 
 			//red unfilled rectangle at the top right corner
 			S2DE_setColor(255,  0,  0);
-			S2DE_rectangle(maxl-100,maxh-100, maxl-200,maxh-200, 0);
+			S2DE_rectangle(
+				S2DE_width-100, S2DE_height-100,
+				S2DE_width-200, S2DE_height-200,
+				0
+			);
 
 			//littleH
 			S2DE_imageRGBA(
-				maxl_2,maxh_2,
-				littleH_width,littleH_height,
+				 S2DE_width/2,  S2DE_height/2,
+				littleH_width, littleH_height,
 				littleH_data
 			);
 
 			//bigH
 			S2DE_imageRGBA(
-				maxl_2/2,maxh_2,
-				bigH_width,bigH_height,
+				S2DE_width/2, S2DE_height/2,
+				  bigH_width,   bigH_height,
 				bigH_data
 			);
 		break;
@@ -230,7 +230,7 @@ int main(int argc, char **argv){
 	}
 
 	//init S2DE
-	S2DE_init(argc,argv, "Program Name [V.V.V]", maxl,maxh);
+	S2DE_init(argc,argv, "Program Name [V.V.V]", 700,700);
 	S2DE_setTimer(100);
 
 	//launch S2DE

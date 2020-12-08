@@ -29,7 +29,7 @@
 
 
 
-/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ S2DE [0.1.2] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ S2DE [0.1.5] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                         Simple 2Dimensional Engine
 
     Developped using freeglut3 (or just GLUT), a graphical 2D/3D engine.
@@ -73,6 +73,14 @@
     22/11/2020 > [0.1.4] :
     - Fixed bug : diagonals appeared in rectangles and quads.
 
+    08/12/2020  > [0.1.5] :
+    - Fixed bug : Mouse Y coordinate is inverted.
+    - Added external variables S2DE_width & S2DE_height.
+    - Modified S2DEL_reshape() :
+      Now, S2DE_newWidth & S2DE_newHeight are set before
+      S2DE_RESHAPE event, and then
+      S2DE_width & S2DE_height are set.
+
     BUGS : .
     NOTES : .
 
@@ -109,8 +117,10 @@ int S2DE_mouseX      = 0;
 int S2DE_mouseY      = 0;
 int S2DE_keyState       = 0; //keyboard
 unsigned short S2DE_key = 0;
-int S2DE_newWidth  = 0; //resize
-int S2DE_newHeight = 0;
+unsigned int S2DE_newWidth  = 0; //resize
+unsigned int S2DE_newHeight = 0;
+unsigned int S2DE_width  = 0;
+unsigned int S2DE_height = 0;
 
 
 
@@ -189,7 +199,7 @@ static void S2DEL_keyReleased_special(int keyCode, int x,int y){
 //mouse
 static void S2DEL_mouseButton(int button, int state, int x,int y){
 	S2DE_mouseX = x;
-	S2DE_mouseY = y;
+	S2DE_mouseY = S2DE_height - y;
 	S2DE_mouseState = state;
 	S2DE_mouseButton = button;
 	S2DE_event(S2DE_MOUSECLICK);
@@ -197,7 +207,7 @@ static void S2DEL_mouseButton(int button, int state, int x,int y){
 
 static void S2DEL_mouseMoved(int x,int y){
 	S2DE_mouseX = x;
-	S2DE_mouseY = y;
+	S2DE_mouseY = S2DE_height - y;
 	S2DE_event(S2DE_MOUSEMOVE);
 }
 
@@ -213,6 +223,8 @@ static void S2DEL_reshape(int width,int height){
 	S2DE_newWidth  = width;
 	S2DE_newHeight = height;
 	S2DE_event(S2DE_RESIZE);
+	S2DE_width  = width;
+	S2DE_height = height;
 }
 
 
@@ -385,7 +397,7 @@ void S2DE_setTimer(int ms){
 // ---------------- BASICS -----------------
 
 //init
-void S2DE_init(int argc, char** argv, const char* name, int width,int height){
+void S2DE_init(int argc, char** argv, const char* name, unsigned int width,unsigned int height){
 	//error case
 	if(name == NULL){
 		printf("RUNTIME ERROR > S2DE.c : S2DE_init() : ");
@@ -393,11 +405,15 @@ void S2DE_init(int argc, char** argv, const char* name, int width,int height){
 		return;
 	}
 
+	//init attributes
+	S2DE_width  = width;
+	S2DE_height = height;
+
 	//init window
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
 	glutInitWindowPosition(0,0);
-	glutInitWindowSize(width, height);
+	glutInitWindowSize(S2DE_width, S2DE_height);
 	S2DE_window = glutCreateWindow(name);
 
 	//some settings

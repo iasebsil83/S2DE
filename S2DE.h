@@ -237,7 +237,7 @@ void S2DE_setTimer(int ms);
 // ---------------- BASICS -----------------
 
 //init
-void S2DE_init(int argc, char** argv, const char* name, int width,int height);
+void S2DE_init(int argc, char** argv, const char* name, unsigned int width,unsigned int height);
 
 //start - stop
 void S2DE_start();
