@@ -10,7 +10,7 @@
 
 // ---------------- DECLARATIONS ----------------
 
-//special key constants
+//keyboard constants
 enum S2DE_KEYBOARD{
 	S2DE_KEY_PRESSED,
 	S2DE_KEY_RELEASED
@@ -176,7 +176,7 @@ enum S2DE_KEYS{
 
 
 
-//mouse constants
+//event constants
 enum S2DE_EVENTS{
 	S2DE_KEYBOARD,
 	S2DE_MOUSECLICK,
