@@ -234,7 +234,7 @@ int main(int argc, char **argv){
 	S2DE_setTimer(100);
 
 	//launch S2DE
-	printf("Starting S2DE [0.1.3]\n");
+	printf("Starting S2DE [0.1.5]\n");
 	S2DE_start();
 
 	return 0;
