@@ -8,6 +8,7 @@
 
 //graphics
 #include "S2DE.h" //2D motor
+#include "PNG/PNG.h"
 
 
 
@@ -68,13 +69,8 @@ extern unsigned int S2DE_height;
 
 
 
-// ---- hashed images ----
-int littleH_width  = 250;
-int littleH_height = 120;
-int* littleH_data = NULL;
-int bigH_width  = 50;
-int bigH_height = 300;
-int* bigH_data = NULL;
+// external images
+PNG* extImage = NULL;
 
 
 
@@ -111,18 +107,11 @@ void S2DE_event(int event){
 				0
 			);
 
-			//littleH
+			//external image
 			S2DE_imageRGBA(
-				 S2DE_width/2,  S2DE_height/2,
-				littleH_width, littleH_height,
-				littleH_data
-			);
-
-			//bigH
-			S2DE_imageRGBA(
-				S2DE_width/2, S2DE_height/2,
-				  bigH_width,   bigH_height,
-				bigH_data
+				300, 100,
+				extImage->width, extImage->height,
+				extImage->data
 			);
 		break;
 
@@ -206,36 +195,22 @@ void S2DE_event(int event){
 
 
 // ---- main ----
-int main(int argc, char **argv){
-
-	//creating littleH
-	littleH_data = malloc(littleH_width*littleH_height*4); //RGBA => 4 bytes per pixel
-	unsigned char blink;
-	int index=0;
-	for(int y=0; y < littleH_height; y++){
-		for(int x=0; x < littleH_width; x++){
-			blink = (x+y)%8 ? 255 : 0;
-			littleH_data[index++] = S2DE_setPixelRGBA(blink, blink, blink, 255);
-		}
-	}
-
-	//creating bigH
-	bigH_data = malloc(bigH_width*bigH_height*4); //RGBA => 4 bytes per pixel
-	index=0;
-	for(int y=0; y < bigH_height; y++){
-		for(int x=0; x < bigH_width; x++){
-			blink = (x+y)%16 ? 255 : 0;
-			bigH_data[index++] = S2DE_setPixelRGBA(blink, blink, 255, 255);
-		}
-	}
+int main(int argc, char** argv){
 
 	//init S2DE
 	S2DE_init(argc,argv, "Program Name [V.V.V]", 700,700);
 	S2DE_setTimer(100);
 
+	//init external image
+	extImage = png_read("PNG/extImage.png");
+
 	//launch S2DE
 	printf("Starting S2DE [0.1.5]\n");
 	S2DE_start();
 
-	return 0;
+	//free external image
+	free(extImage->data);
+	free(extImage);
+
+	return EXIT_SUCCESS;
 }
