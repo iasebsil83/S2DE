@@ -11,7 +11,7 @@ prog.o: prog.c S2DE.h PNG/PNG.h
 
 
 
-#PNG library
+#PNG library => NOT REQUIRED BY S2DE, THIS IS JUST AN EXAMPLE OF USING PNG IMAGES INTO S2DE
 PNG.o: PNG/PNG.c PNG/PNG.h
 	gcc -Wall -c PNG/PNG.c -O2
 
