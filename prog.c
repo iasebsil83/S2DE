@@ -8,7 +8,6 @@
 
 //graphics
 #include "S2DE.h" //2D motor
-#include "PNG/PNG.h"
 
 
 
@@ -69,11 +68,6 @@ extern unsigned int S2DE_height;
 
 
 
-// external images
-PNG* extImage = NULL;
-
-
-
 
 
 
@@ -105,13 +99,6 @@ void S2DE_event(int event){
 				S2DE_width-100, S2DE_height-100,
 				S2DE_width-200, S2DE_height-200,
 				0
-			);
-
-			//external image
-			S2DE_imageRGBA(
-				300, 100,
-				extImage->width, extImage->height,
-				extImage->data
 			);
 		break;
 
@@ -200,9 +187,6 @@ int main(int argc, char** argv){
 	//init S2DE
 	S2DE_init(argc,argv, "Program Name [V.V.V]", 700,700);
 	S2DE_setTimer(100);
-
-	//init external image
-	extImage = png_read("PNG/extImage.png");
 
 	//launch S2DE
 	printf("Starting S2DE [0.1.5]\n");

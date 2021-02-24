@@ -82,7 +82,12 @@
       S2DE_width & S2DE_height are set.
 
     BUGS : .
-    NOTES : .
+    NOTES : S2DE is now compatible with another library I made
+    for PNG image manipulation : PNG.c/.h.
+    It is available here :
+            https://github.com/iasebsil83/C_PNG
+    Use S2DE_imageRGBA() to draw image on screen.
+
 
     Contact     : i.a.sebsil83@gmail.com
     Youtube     : https://www.youtube.com/user/IAsebsil83

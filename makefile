@@ -1,12 +1,12 @@
 #executable
-run: prog.o S2DE.o PNG.o
-	gcc -Wall -o run prog.o S2DE.o PNG.o -lglut -lGL -lpng -O2
+run: prog.o S2DE.o
+	gcc -Wall -o run prog.o S2DE.o -lglut -lGL -O2
 	rm -f *.o
 
 
 
 #program
-prog.o: prog.c S2DE.h PNG/PNG.h
+prog.o: prog.c S2DE.h
 	gcc -Wall -c prog.c -O2
 
 
