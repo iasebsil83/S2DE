@@ -192,9 +192,5 @@ int main(int argc, char** argv){
 	printf("Starting S2DE [0.1.5]\n");
 	S2DE_start();
 
-	//free external image
-	free(extImage->data);
-	free(extImage);
-
 	return EXIT_SUCCESS;
 }
