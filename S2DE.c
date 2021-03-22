@@ -3,6 +3,7 @@
 //standard
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 
 
@@ -29,7 +30,15 @@
 
 
 
-/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ S2DE [0.1.5] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
+
+
+
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ S2DE [0.1.6] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                         Simple 2Dimensional Engine
 
     Developped using freeglut3 (or just GLUT), a graphical 2D/3D engine.
@@ -73,13 +82,16 @@
     22/11/2020 > [0.1.4] :
     - Fixed bug : diagonals appeared in rectangles and quads.
 
-    08/12/2020  > [0.1.5] :
+    08/12/2020 > [0.1.5] :
     - Fixed bug : Mouse Y coordinate is inverted.
     - Added external variables S2DE_width & S2DE_height.
     - Modified S2DEL_reshape() :
       Now, S2DE_newWidth & S2DE_newHeight are set before
       S2DE_RESHAPE event, and then
       S2DE_width & S2DE_height are set.
+
+    22/03/2021 > [0.1.6] :
+    - Added S2DE_MOUSE_SCROLL event.
 
     BUGS : .
     NOTES : S2DE is now compatible with another library I made
@@ -125,30 +137,47 @@
 
 
 
+
+
+
+
+
+
+
+
 // ---------------- INITIALIZATION ----------------
 
 //window
-static int S2DE_window = -1;
+static int S2DE_window               = -1;
 static int S2DE_timedExecution_delay = -1;
 
 
 
 //event variables
-int S2DE_mouseState  = 0; //mouse
-int S2DE_mouseButton = 0;
-int S2DE_mouseX      = 0;
-int S2DE_mouseY      = 0;
-int S2DE_keyState       = 0; //keyboard
-unsigned short S2DE_key = 0;
+int S2DE_mouseState         = 0; //mouse
+int S2DE_mouseButton        = 0;
+int S2DE_mouseScroll        = 0;
+int S2DE_mouseX             = 0;
+int S2DE_mouseY             = 0;
+int S2DE_keyState           = 0; //keyboard
+unsigned short S2DE_key     = 0;
 unsigned int S2DE_newWidth  = 0; //resize
 unsigned int S2DE_newHeight = 0;
-unsigned int S2DE_width  = 0;
-unsigned int S2DE_height = 0;
+unsigned int S2DE_width     = 0;
+unsigned int S2DE_height    = 0;
 
 
 
 //event handler
 extern void S2DE_event(int event);
+
+
+
+
+
+
+
+
 
 
 
@@ -224,14 +253,28 @@ static void S2DEL_mouseButton(int button, int state, int x,int y){
 	S2DE_mouseX = x;
 	S2DE_mouseY = S2DE_height - y;
 	S2DE_mouseState = state;
-	S2DE_mouseButton = button;
-	S2DE_event(S2DE_MOUSECLICK);
+
+	//scroll
+	if(button == 3 || button == 4){
+		if(state == S2DE_MOUSE_PRESSED){
+			S2DE_mouseScroll = button;
+			S2DE_event(S2DE_MOUSE_SCROLL);
+		}
+	}else{
+		S2DE_mouseButton = button;
+		S2DE_event(S2DE_MOUSE_CLICK);
+	}
 }
 
 static void S2DEL_mouseMoved(int x,int y){
 	S2DE_mouseX = x;
 	S2DE_mouseY = S2DE_height - y;
-	S2DE_event(S2DE_MOUSEMOVE);
+	usleep(1);
+	if(S2DE_mouseScroll == 0){
+		S2DE_event(S2DE_MOUSE_MOVE);
+	}else{
+		S2DE_mouseScroll = 0;
+	}
 }
 
 
@@ -249,6 +292,14 @@ static void S2DEL_reshape(int width,int height){
 	S2DE_width  = width;
 	S2DE_height = height;
 }
+
+
+
+
+
+
+
+
 
 
 
@@ -361,6 +412,7 @@ void S2DE_quad(float x1,float y1, float x2,float y2, float x3,float y3, float x4
 
 //text
 void S2DE_text(char* text, float size, float x,float y){
+
 	//moving over display (use of the 3rd dimension)
 	glPushMatrix();
 	glTranslatef(x,y,0);
@@ -368,8 +420,7 @@ void S2DE_text(char* text, float size, float x,float y){
 
 	//error case
 	if(text == NULL){
-		printf("RUNTIME ERROR > S2DE.c : S2DE_text() : ");
-		printf("Text is NULL.\n");
+		printf("RUNTIME ERROR > S2DE.c : S2DE_text() : Text is NULL.\n");
 		return;
 	}
 
@@ -417,14 +468,22 @@ void S2DE_setTimer(int ms){
 
 
 
+
+
+
+
+
+
+
+
 // ---------------- BASICS -----------------
 
 //init
 void S2DE_init(int argc, char** argv, const char* name, unsigned int width,unsigned int height){
+
 	//error case
 	if(name == NULL){
-		printf("RUNTIME ERROR > S2DE.c : S2DE_init() : ");
-		printf("Cannot init window, name is NULL.\n");
+		printf("RUNTIME ERROR > S2DE.c : S2DE_init() : Cannot init window, name is NULL.\n");
 		return;
 	}
 

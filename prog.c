@@ -57,6 +57,7 @@
 //event variables
 extern int S2DE_mouseState; //mouse
 extern int S2DE_mouseButton;
+extern int S2DE_mouseScroll;
 extern int S2DE_mouseX;
 extern int S2DE_mouseY;
 extern int S2DE_keyState; //keyboard
@@ -65,6 +66,14 @@ extern unsigned int S2DE_newWidth; //resize
 extern unsigned int S2DE_newHeight;
 extern unsigned int S2DE_width;
 extern unsigned int S2DE_height;
+
+
+
+
+
+
+
+
 
 
 
@@ -135,7 +144,7 @@ void S2DE_event(int event){
 
 
 		//mouse
-		case S2DE_MOUSECLICK:
+		case S2DE_MOUSE_CLICK:
 			//state
 			if(S2DE_mouseState == S2DE_MOUSE_PRESSED)
 				printf("MOUSE_PRESSED : ");
@@ -158,8 +167,22 @@ void S2DE_event(int event){
 
 
 
+		//mouse scroll
+		case S2DE_MOUSE_SCROLL:
+			switch(S2DE_mouseScroll){
+				case S2DE_SCROLL_UP:
+					printf("Scrolling up at (%i,%i)\n", S2DE_mouseX,S2DE_mouseY);
+				break;
+				case S2DE_SCROLL_DOWN:
+					printf("Scrolling down at (%i,%i)\n", S2DE_mouseX,S2DE_mouseY);
+				break;
+			}
+		break;
+
+
+
 		//mouse move
-		case S2DE_MOUSEMOVE:
+		case S2DE_MOUSE_MOVE:
 			printf("Mouse is moving passively to (%i,%i)\n", S2DE_mouseX,S2DE_mouseY);
 		break;
 
@@ -189,7 +212,7 @@ int main(int argc, char** argv){
 	S2DE_setTimer(100);
 
 	//launch S2DE
-	printf("Starting S2DE [0.1.5]\n");
+	printf("Starting S2DE [0.1.6]\n");
 	S2DE_start();
 
 	return EXIT_SUCCESS;
