@@ -270,7 +270,7 @@ static void S2DEL_mouseMoved(int x,int y){
 	S2DE_mouseX = x;
 	S2DE_mouseY = S2DE_height - y;
 	usleep(1);
-	if(S2DE_mouseScroll == 0){
+	if(!S2DE_mouseScroll){
 		S2DE_event(S2DE_MOUSE_MOVE);
 	}else{
 		S2DE_mouseScroll = 0;
