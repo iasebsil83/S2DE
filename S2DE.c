@@ -512,6 +512,7 @@ void S2DE_init(int argc, char** argv, const char* name, unsigned int width,unsig
 	glEnable(GL_POLYGON_SMOOTH);
 	glEnable(GL_NORMALIZE);
 	glutSetKeyRepeat(GLUT_KEY_REPEAT_OFF);
+	glPointSize(2.f);
 
 	//set local S2DE event handlers (S2DEL)
 	glutDisplayFunc      (S2DEL_display            );
