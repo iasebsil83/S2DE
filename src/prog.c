@@ -7,7 +7,7 @@
 
 
 //graphics
-#include "S2DE.h" //2D motor
+#include "../lib/S2DE.h" //2D motor
 
 
 
