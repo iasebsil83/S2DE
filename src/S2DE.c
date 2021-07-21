@@ -30,14 +30,6 @@
 
 
 
-
-
-
-
-
-
-
-
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ S2DE [0.1.6] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                         Simple 2Dimensional Engine
 
@@ -137,15 +129,7 @@
 
 
 
-
-
-
-
-
-
-
-
-// ---------------- INITIALIZATION ----------------
+// ---------------- INITIALISATION ----------------
 
 //window
 static int S2DE_window               = -1;
@@ -170,14 +154,6 @@ unsigned int S2DE_height    = 0;
 
 //event handler
 extern void S2DE_event(int event);
-
-
-
-
-
-
-
-
 
 
 
@@ -292,14 +268,6 @@ static void S2DEL_reshape(int width,int height){
 	S2DE_width  = width;
 	S2DE_height = height;
 }
-
-
-
-
-
-
-
-
 
 
 
@@ -456,14 +424,6 @@ void S2DE_setTimer(int ms){
 	//set new timedExecution delay
 	S2DE_timedExecution_delay = ms;
 }
-
-
-
-
-
-
-
-
 
 
 

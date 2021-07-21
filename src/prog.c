@@ -78,14 +78,6 @@ extern unsigned int S2DE_height;
 
 
 
-
-
-
-
-
-
-
-
 // ---------------- EXECUTION ----------------
 
 // ---- events ----
