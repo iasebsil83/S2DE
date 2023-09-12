@@ -5,16 +5,12 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-
-
 //graphic engine
 #ifdef __APPLE__
 	#include <GLUT/glut.h>
 #else
 	#include <glut.h>
 #endif
-
-
 
 //own header
 #include "S2DE.h"
@@ -24,13 +20,7 @@
 
 
 
-
-
-
-
-
-
-/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ S2DE [0.1.6] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ S2DE [0.1.7] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                         Simple 2Dimensional Engine
 
     Developped using freeglut3 (or just GLUT), a graphical 2D/3D engine.
@@ -85,6 +75,10 @@
     22/03/2021 > [0.1.6] :
     - Added S2DE_MOUSE_SCROLL event.
 
+    10/09/2023 > [0.1.7] :
+    - Added S2DE_setBackColor().
+    - Changed S2DE_setColor() into S2DE_setFrontColor().
+
     BUGS : .
     NOTES : S2DE is now compatible with another library I made
     for PNG image manipulation : PNG.c/.h.
@@ -126,19 +120,16 @@
 
 
 
-
-
-
-
-
-
 // ---------------- INITIALISATION ----------------
 
 //window
 static int S2DE_window               = -1;
 static int S2DE_timedExecution_delay = -1;
 
-
+//colors
+unsigned char S2DE_backColor_r = '\0';
+unsigned char S2DE_backColor_g = '\0';
+unsigned char S2DE_backColor_b = '\0';
 
 //event variables
 int S2DE_mouseState         = 0; //mouse
@@ -153,16 +144,8 @@ unsigned int S2DE_newHeight = 0;
 unsigned int S2DE_width     = 0;
 unsigned int S2DE_height    = 0;
 
-
-
 //event handler
 extern void S2DE_event(int event);
-
-
-
-
-
-
 
 
 
@@ -192,7 +175,6 @@ static void S2DEL_timedExecution(int i){
 //display
 static void S2DEL_display(){
 	glFlush();
-	glClearColor(1.f, 1.f, 1.f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	S2DE_event(S2DE_DISPLAY);
 	glutSwapBuffers();
@@ -277,12 +259,6 @@ static void S2DEL_reshape(int width,int height){
 
 
 
-
-
-
-
-
-
 // ---------------- UTILITIES ----------------
 
 //useful
@@ -294,8 +270,21 @@ void S2DE_fullScreen(){
 	glutFullScreen();
 }
 
-void S2DE_setColor(int r, int v, int b){
-	glColor3f(r/255.f, v/255.f, b/255.f);
+void S2DE_setBackColor(unsigned char r, unsigned char g, unsigned char b){
+	glClearColor(
+		((float)r)/255.f,
+		((float)g)/255.f,
+		((float)b)/255.f,
+		1.f
+	);
+}
+
+void S2DE_setFrontColor(unsigned char r, unsigned char g, unsigned char b){
+	glColor3f(
+		((float)r)/255.f,
+		((float)g)/255.f,
+		((float)b)/255.f
+	);
 }
 
 void S2DE_setThickness(float thickness){
@@ -436,12 +425,6 @@ void S2DE_setTimer(int ms){
 	//set new timedExecution delay
 	S2DE_timedExecution_delay = ms;
 }
-
-
-
-
-
-
 
 
 

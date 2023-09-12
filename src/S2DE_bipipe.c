@@ -3,6 +3,15 @@
 //standard
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
+#include <unistd.h>
+#include <string.h>
+
+//basename
+#include <libgen.h>
+
+//queues
+#include "../lib/queues.h"
 
 //threads
 #include "../lib/threads.h"
@@ -57,6 +66,8 @@
       - S2DE_bipipe will receive orders :
         "i0000000011111111<title_name>`"                                    : Initialize window with w,h on 32b & title until '`' found
         "I"                                                                 : Close window
+        "c001100"                                                           : Set background color with r,g,b on 3*8b
+        "C001100"                                                           : Set front color with r,g,b on 3*8b
         "p00000000111111110000000011111111"                                 : Draw point with x,y on 32b
         "l00000000111111110000000011111111"                                 : Draw line with x1,y1,x2,y2
         "t000000001111111100000000111111110000000011111111"                 : Draw empty triangle with x1,y1,x2,y2,x3,y3 on 32b
@@ -64,7 +75,7 @@
         "r00000000111111110000000011111111"                                 : Draw empty rectangle with x1,y1,x2,y2 on 32b
         "R00000000111111110000000011111111"                                 : Same thing but filled
         "q0000000011111111000000001111111100000000111111110000000011111111" : Draw empty quad with x1,y1,x2,y2,x3,y3,x4,y4 on 32b
-        "Q00000000111111110000000011111111"                                 : Same thing but filled
+        "Q0000000011111111000000001111111100000000111111110000000011111111" : Same thing but filled
 
       - S2DE_bipipe will send events :
         "k0000"              : Key pressed with key on 32b
@@ -112,12 +123,43 @@ extern unsigned int S2DE_height;
 //refresh delay
 #define DISPLAY_FPS 10
 
-//instructions bipipe
-bipipe* bp;
+//global variables
+#define GET false
+#define SET true
+#define DISPLAY_OBJECTS_MAX   50
+#define PEER_KILL_WHEN_ESCAPE        //kill peer subprocess if escape key is pressed
+#define PEER_TEMPORIZATION    500000 //delay (in us) before starting instruction analysis loop (time for the subprocess to be launched)
+#define BIPIPE_LENGTH         128    // (in B)
 
 //additionnal option (mouse move event can overwhelm other events)
 //#define IGNORE_MOUSE_MOVE
 //#define VERBOSE_INVALID_CHARACTERS
+
+
+
+
+
+
+// ---------------- GETTER - SETTERS ----------------
+
+//global variables
+bipipe* comBipipe(bool action, bipipe* value){
+	static bipipe* com_bipipe = NULL;
+	if(action){ com_bipipe = value; } //set
+	return com_bipipe;                //get
+}
+
+proc* peerSubprocess(bool action, proc* value){
+	static proc* peer_subprocess = NULL;
+	if(action){ peer_subprocess = value; } //set
+	return peer_subprocess;                //get
+}
+
+queue* displayObjects(bool action, queue* value){
+	static queue* display_objects = NULL;
+	if(action){ display_objects = value; } //set
+	return display_objects;                //get
+}
 
 
 
@@ -156,7 +198,7 @@ void int2hex(char* result, unsigned int i){
 	result[7] = halfbyte2hex( (i & 0xf0000000) >> 28);
 }
 
-int hex2halfbyte(char hex){
+unsigned int hex2halfbyte(char hex){
 	if(hex < '0' || (hex > '9' && hex < 'a') || hex > 'f'){
 		fprintf(stderr, "RUNTIME ERROR > S2DE_bipipe.c : hex2halfbyte() : Invalid hex character '%c'.\n", hex);
 		return 0;
@@ -167,7 +209,14 @@ int hex2halfbyte(char hex){
 	return hex-'0';
 }
 
-int hex2int(char* hex){
+unsigned char hex2byte(char* hex){
+	return \
+		(hex2halfbyte(hex[0]) <<  4) + \
+		(hex2halfbyte(hex[1])      )   \
+	;
+}
+
+unsigned int hex2int(char* hex){
 	return \
 		(hex2halfbyte(hex[0]) << 28) + \
 		(hex2halfbyte(hex[1]) << 24) + \
@@ -185,20 +234,130 @@ int hex2int(char* hex){
 
 // ---------------- EXECUTION ----------------
 
+//draw from given instruction
+void draw(char* sequence){
+	unsigned char r,g,b;
+	unsigned int  x1,y1, x2,y2, x3,y3, x4,y4;
+	switch(sequence[0]){
+
+		//background color
+		case 'c':
+			r = hex2byte(sequence+1);	g = hex2byte(sequence+2);	b = hex2byte(sequence+3);
+			S2DE_setBackColor(r,g,b);
+		break;
+
+		//front color
+		case 'C':
+			r = hex2byte(sequence+1);	g = hex2byte(sequence+2);	b = hex2byte(sequence+3);
+			S2DE_setFrontColor(r,g,b);
+		break;
+
+		//point
+		case 'p':
+			x1 = hex2int(sequence+1);	y1 = hex2int(sequence+9);
+			S2DE_point(x1,y1);
+		break;
+
+		//line
+		case 'l':
+			x1 = hex2int(sequence+1);	y1 = hex2int(sequence+9);
+			x2 = hex2int(sequence+17);	y2 = hex2int(sequence+25);
+			S2DE_line(x1,y1, x2,y2);
+		break;
+
+		//empty triangle
+		case 't':
+			x1 = hex2int(sequence+1);	y1 = hex2int(sequence+9);
+			x2 = hex2int(sequence+17);	y2 = hex2int(sequence+25);
+			x3 = hex2int(sequence+33);	y3 = hex2int(sequence+41);
+			S2DE_triangle(x1,y1, x2,y2, x3,y3, false);
+		break;
+
+		//full triangle
+		case 'T':
+			x1 = hex2int(sequence+1);	y1 = hex2int(sequence+9);
+			x2 = hex2int(sequence+17);	y2 = hex2int(sequence+25);
+			x3 = hex2int(sequence+33);	y3 = hex2int(sequence+41);
+			S2DE_triangle(x1,y1, x2,y2, x3,y3, true);
+		break;
+
+		//empty rectangle
+		case 'r':
+			x1 = hex2int(sequence+1);	y1 = hex2int(sequence+9);
+			x2 = hex2int(sequence+17);	y2 = hex2int(sequence+25);
+			S2DE_rectangle(x1,y1, x2,y2, false);
+		break;
+
+		//full rectangle
+		case 'R':
+			x1 = hex2int(sequence+1);	y1 = hex2int(sequence+9);
+			x2 = hex2int(sequence+17);	y2 = hex2int(sequence+25);
+			S2DE_rectangle(x1,y1, x2,y2, true);
+		break;
+
+		//empty quad
+		case 'q':
+			x1 = hex2int(sequence+1);	y1 = hex2int(sequence+9);
+			x2 = hex2int(sequence+17);	y2 = hex2int(sequence+25);
+			x3 = hex2int(sequence+33);	y3 = hex2int(sequence+41);
+			x4 = hex2int(sequence+49);	y4 = hex2int(sequence+57);
+			S2DE_quad(x1,y1, x2,y2, x3,y3, x4,y4, false);
+		break;
+
+		//full quad
+		case 'Q':
+			x1 = hex2int(sequence+1);	y1 = hex2int(sequence+9);
+			x2 = hex2int(sequence+17);	y2 = hex2int(sequence+25);
+			x3 = hex2int(sequence+33);	y3 = hex2int(sequence+41);
+			x4 = hex2int(sequence+49);	y4 = hex2int(sequence+57);
+			S2DE_quad(x1,y1, x2,y2, x3,y3, x4,y4, true);
+		break;
+
+		//unknown sequence
+		default:
+			fprintf(stderr, "INTERNAL ERROR > S2DE_bipipe.c : draw() : Unknown instruction '%c'.\n", sequence[0]);
+	}
+}
+
+
+
 //events
 void S2DE_event(int event){
 	char* sequence;
+
+	//get global vars
+	queue*  display_objects = displayObjects(GET, NULL);
+	bipipe* com_bipipe      = comBipipe(GET, NULL);
+
+	//redirect event
 	switch(event){
 
 		//display
 		case S2DE_DISPLAY:
-			
+
+			//draw each object
+			for(size_t q=0; q < display_objects->length; q++){
+				draw( queue_get(display_objects, q) );
+			}
+
+			//reset queue
+			queue_clear(display_objects);
 		break;
 
 
 
 		//keyboard
 		case S2DE_KEYBOARD:
+
+			//special behaviour
+			#ifdef PEER_KILL_WHEN_ESCAPE
+			if(S2DE_key == S2DE_KEY_ESCAPE){
+				proc* peer_subprocess = peerSubprocess(GET, NULL);
+				proc_stop(peer_subprocess, PROC__STOP_KILL);
+			}
+			#endif
+
+			//regular case
 			sequence    = malloc(6); //k0000\0
 			sequence[5] = '\0';
 
@@ -212,7 +371,7 @@ void S2DE_event(int event){
 			short2hex(sequence+1, S2DE_key);
 
 			//send sequence
-			bipipe_write(bp, sequence);
+			bipipe_write(com_bipipe, sequence);
 			free(sequence);
 		break;
 
@@ -237,7 +396,7 @@ void S2DE_event(int event){
 			int2hex(sequence+10, S2DE_mouseY);
 
 			//send sequence
-			bipipe_write(bp, sequence);
+			bipipe_write(com_bipipe, sequence);
 			free(sequence);
 		break;
 
@@ -256,7 +415,7 @@ void S2DE_event(int event){
 			}
 
 			//send sequence
-			bipipe_write(bp, sequence);
+			bipipe_write(com_bipipe, sequence);
 			free(sequence);
 		break;
 
@@ -274,7 +433,7 @@ void S2DE_event(int event){
 			int2hex(sequence+9, S2DE_mouseY);
 
 			//send sequence
-			bipipe_write(bp, sequence);
+			bipipe_write(com_bipipe, sequence);
 			free(sequence);
 			#endif
 		break;
@@ -299,7 +458,7 @@ void S2DE_event(int event){
 			int2hex(sequence+9, S2DE_newHeight);
 
 			//send sequence
-			bipipe_write(bp, sequence);
+			bipipe_write(com_bipipe, sequence);
 			free(sequence);
 		break;
 	}
@@ -310,28 +469,35 @@ void S2DE_event(int event){
 //run S2DE main loop
 void* S2DE_mainLoop(void* args){
 
-	//set constant periodic timer
-	S2DE_setTimer(DISPLAY_DELAY);
+	//set constant periodic timer (must be expressed in ms)
+	S2DE_setTimer(1000.f/DISPLAY_FPS);
 
 	//launch S2DE
 	S2DE_start();
+
+	return NULL;
 }
 
 
 
 //analyze incomming instructions
-void anaylzeIncomming(){
+void analyzeIncomming(){
+
+	//get global vars
+	queue*  display_objects = displayObjects(GET, NULL);
+	bipipe* com_bipipe      = comBipipe(GET, NULL);
 
 	//S2DE main loop
 	thread* S2DE_mainLoop_thread;
 	bool    S2DE_mainLoop_started = false;
 
+	//receive data
 	char*   reception;
 	size_t  reception_len;
 	while(true){
 
 		//read from bipipe (execution is stuck here, no temporization required)
-		bipipe_read(bp, reception);
+		reception = bipipe_read(com_bipipe);
 		reception_len = strlen(reception);
 
 		//read reception
@@ -348,7 +514,7 @@ void anaylzeIncomming(){
 
 					//S2DE main loop already started
 					if(S2DE_mainLoop_started){
-						fputs("RUNTIME ERROR > S2DE_bipipe.c : analizeIncomming() : S2DE main loop has already started.", stderr);
+						//fputs("RUNTIME ERROR > S2DE_bipipe.c : analizeIncomming() : S2DE main loop has already started.\n", stderr);
 					}
 
 					//start S2DE main loop
@@ -356,7 +522,7 @@ void anaylzeIncomming(){
 
 						//read arguments
 						if(reception_len < r+17){ //bytes required in sequence i0000000011111111 (17)
-							fputs("RUNTIME ERROR > S2DE_bipipe.c : analyzeIncomming() : Missing elements in sequence 'i'.", stderr);
+							fputs("RUNTIME ERROR > S2DE_bipipe.c : analyzeIncomming() : Missing elements in sequence 'i'.\n", stderr);
 							continue;
 						}
 						int width  = hex2int(reception+1);
@@ -372,8 +538,8 @@ void anaylzeIncomming(){
 
 						//title : no delimiter index in given sequence
 						if(title_endIndex == reception_len){
-							fputs("RUNTIME ERROR > S2DE_bipipe.c : analyzeIncomming() : No delimiter index in bipipe sequence.",     stderr);
-							fputs("                                                     Maybe you should use a shorter title name.", stderr);
+							fputs("RUNTIME ERROR > S2DE_bipipe.c : analyzeIncomming() : No delimiter index in bipipe sequence.\n",     stderr);
+							fputs("                                                     Maybe you should use a shorter title name.\n", stderr);
 							continue;
 						}
 
@@ -403,13 +569,11 @@ void anaylzeIncomming(){
 				case 'I':
 
 					//stop S2DE main loop
-					if(S2DE_mainLoop_started){
-						thread_stop(S2DE_mainLoop_thread, THREADS__INTERRUPT);
-					}
+					if(S2DE_mainLoop_started){ thread_stop(S2DE_mainLoop_thread, THREAD__INTERRUPT); }
 
 					//S2DE main loop not started yet
 					else{
-						fputs("RUNTIME ERROR > S2DE_bipipe.c : analizeIncomming() : S2DE main loop has already started.", stderr);
+						//fputs("RUNTIME ERROR > S2DE_bipipe.c : analizeIncomming() : S2DE main loop has already started.\n", stderr);
 					}
 				break;
 
@@ -417,8 +581,40 @@ void anaylzeIncomming(){
 
 				// DISPLAY
 
+				//set background / front color
+				case 'c':	case 'C':
+					if(display_objects->length < DISPLAY_OBJECTS_MAX){
+						queue_append(display_objects, reception+r, 7);
+					}
+				break;
+
 				//draw point
 				case 'p':
+					if(display_objects->length < DISPLAY_OBJECTS_MAX){
+						queue_append(display_objects, reception+r, 17);
+					}
+				break;
+
+				//draw line / empty rectangle / full rectangle
+				case 'l':
+				case 'r':	case 'R':
+					if(display_objects->length < DISPLAY_OBJECTS_MAX){
+						queue_append(display_objects, reception+r, 33);
+					}
+				break;
+
+				//draw empty triangle / full triangle
+				case 't':	case 'T':
+					if(display_objects->length < DISPLAY_OBJECTS_MAX){
+						queue_append(display_objects, reception+r, 49);
+					}
+				break;
+
+				//draw empty quad / full quad
+				case 'q':	case 'Q':
+					if(display_objects->length < DISPLAY_OBJECTS_MAX){
+						queue_append(display_objects, reception+r, 65);
+					}
 				break;
 
 				//undefined sequence
@@ -433,8 +629,6 @@ void anaylzeIncomming(){
 		//free reception string
 		free(reception);
 	}
-
-	return NULL;
 }
 
 
@@ -444,14 +638,38 @@ int main(int argc, char** argv){
 
 	//missing arguments
 	if(argc == 1){
-		fputs("FATAL ERROR > S2DE_bipipe.c : main() : Missing argument in first position (peer application name).", stderr);
+		fputs("FATAL ERROR > S2DE_bipipe.c : main() : Missing argument in first position (peer application name).\n", stderr);
 		return EXIT_FAILURE;
 	}
 
-	//get peer application name & arguments
-	char* peer_exe = argv[1];
+
+
+	// PEER SUBPROCESS
+
+	//create global display_objects
+	displayObjects(SET, queue_create());
+
+	//create global communication bipipe
+	bipipe* com_bipipe = comBipipe(SET, bipipe_create(BIPIPE_LENGTH)); //get & set at the same time
+
+	//reformat arguments to fit with peer
+	char* peer_fullPath = argv[1];
+	argv[0] = basename(peer_fullPath);
+	argv[1] = com_bipipe->info;
 
 	//create peer subprocess
+	proc* peer_subprocess = peerSubprocess(SET, proc_create(peer_fullPath, argv)); //get & set at the same time
+
+	//launch subprocess (the one who will exchange instructions)
+	proc_start(peer_subprocess);
+	usleep(PEER_TEMPORIZATION);
+
+	//now close the correct bipipes gates as we are the PARENT process
+	bipipe_everybodyJoined(com_bipipe);
+
+
+
+	// CURRENT EXECUTION
 
 	//run analyze loop
 	analyzeIncomming();

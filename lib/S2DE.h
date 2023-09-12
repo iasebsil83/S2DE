@@ -210,7 +210,8 @@ enum S2DE_EVENTS{
 //useful
 void S2DE_refresh();
 void S2DE_fullScreen();
-void S2DE_setColor(int r, int v, int b);
+void S2DE_setBackColor(unsigned char r, unsigned char g, unsigned char b);
+void S2DE_setFrontColor(unsigned char r, unsigned char g, unsigned char b);
 void S2DE_setThickness(float thickness);
 
 //graphics
