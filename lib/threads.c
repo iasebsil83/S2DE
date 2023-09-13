@@ -4,14 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
-
-
 //multithreading
 #include <pthread.h>
-
-
-
 
 //own header
 #include "threads.h"
@@ -21,9 +15,7 @@
 
 
 
-
-
-/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Threads [0.1.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Threads [0.1.1] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                  Threads by I.A.
 
         Threads is just an utility program that allows you to manipulate
@@ -37,6 +29,9 @@
 
     08/01/2021 > [0.1.0] :
     - Created threads.c/.h.
+
+    13/09/2023 > [0.1.1] :
+    - Added argument passing to thread_create().
 
     BUGS : .
     NOTES : .
@@ -79,7 +74,7 @@
 // -------------------------------- THREADS --------------------------------
 
 //create - delete
-thread* thread_create(void* (*function)(void*)){
+thread* thread_create(void* (*function)(void*), void* args){
 	if(function == NULL){
 		printf("RUNTIME ERROR > threads.c : thread_create() : Thread function is NULL.\n");
 		return NULL;
@@ -94,7 +89,8 @@ thread* thread_create(void* (*function)(void*)){
 
 	//set struct values
 	t->function = function;
-	t->tid = 0; //t->tid will be set when launching the thread
+	t->tid = 0;             //t->tid will be set when launching the thread
+	t->args = args;
 
 	return t;
 }
@@ -137,7 +133,7 @@ void thread_start(thread* t){
 		&(t->tid),
 		NULL,
 		t->function,
-		NULL
+		t->args
 	);
 }
 

@@ -15,7 +15,8 @@
 #define THREAD__INTERRUPT    0
 
 struct THREAD{
-	void* (*function)(void*);
+	void*     (*function)(void*);
+	void*     args;
 	pthread_t tid;
 };
 typedef struct THREAD thread;
@@ -30,7 +31,7 @@ typedef struct THREAD thread;
 // -------------------------------- THREADS --------------------------------
 
 //create - delete
-thread* thread_create(void* (*function)(void*));
+thread* thread_create(void* (*function)(void*), void* args);
 void thread_delete(thread* t);
 
 

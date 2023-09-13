@@ -1,5 +1,5 @@
 #generate all
-all: S2DE_bipipe techt
+all: S2DE_bipipe peer_example
 	rm *.o
 
 
@@ -10,11 +10,11 @@ all: S2DE_bipipe techt
 # ---------------- MAIN PROGRAM ----------------
 
 #executable
-S2DE_bipipe: S2DE_bipipe.o S2DE.o bipipes.o processes.o threads.o queues.o
-	gcc -Wall -o S2DE_bipipe S2DE_bipipe.o S2DE.o bipipes.o processes.o threads.o queues.o -lglut -lGL -pthread -O2
+S2DE_bipipe: S2DE_bipipe.o S2DE.o bipipes.o threads.o queues.o
+	gcc -Wall -o S2DE_bipipe S2DE_bipipe.o S2DE.o bipipes.o threads.o queues.o -lglut -lGL -pthread -O2
 
 #program
-S2DE_bipipe.o: src/S2DE_bipipe.c lib/S2DE.h lib/bipipes.h lib/processes.h lib/threads.h lib/queues.h
+S2DE_bipipe.o: src/S2DE_bipipe.c lib/S2DE.h lib/bipipes.h lib/threads.h lib/queues.h
 	gcc -Wall -c src/S2DE_bipipe.c -O2
 
 
@@ -25,12 +25,12 @@ S2DE_bipipe.o: src/S2DE_bipipe.c lib/S2DE.h lib/bipipes.h lib/processes.h lib/th
 # ---------------- EXAMPLE PEER ----------------
 
 #executable
-techt: techt.o bipipes.o threads.o
-	gcc -o techt techt.o bipipes.o threads.o -pthread -Wall -O2
+peer_example: peer_example.o bipipes.o threads.o processes.o
+	gcc -o peer_example peer_example.o bipipes.o threads.o processes.o -pthread -Wall -O2
 
 #program
-techt.o: src/techt.c lib/bipipes.h lib/threads.h
-	gcc -c src/techt.c -Wall -O2
+peer_example.o: src/peer_example.c lib/bipipes.h lib/threads.h lib/processes.h
+	gcc -c src/peer_example.c -Wall -O2
 
 
 

@@ -127,9 +127,10 @@ static int S2DE_window               = -1;
 static int S2DE_timedExecution_delay = -1;
 
 //colors
-unsigned char S2DE_backColor_r = '\0';
-unsigned char S2DE_backColor_g = '\0';
-unsigned char S2DE_backColor_b = '\0';
+static float S2DE_backColor_r = 0.f;
+static float S2DE_backColor_g = 0.f;
+static float S2DE_backColor_b = 0.f;
+static float S2DE_backColor_a = 1.f;
 
 //event variables
 int S2DE_mouseState         = 0; //mouse
@@ -175,6 +176,12 @@ static void S2DEL_timedExecution(int i){
 //display
 static void S2DEL_display(){
 	glFlush();
+	glClearColor(
+		S2DE_backColor_r,
+		S2DE_backColor_g,
+		S2DE_backColor_b,
+		S2DE_backColor_a
+	);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	S2DE_event(S2DE_DISPLAY);
 	glutSwapBuffers();
@@ -270,20 +277,19 @@ void S2DE_fullScreen(){
 	glutFullScreen();
 }
 
-void S2DE_setBackColor(unsigned char r, unsigned char g, unsigned char b){
-	glClearColor(
+void S2DE_setBackColor(unsigned char r, unsigned char g, unsigned char b, unsigned char a){
+	S2DE_backColor_r = ((float)r)/255.f;
+	S2DE_backColor_g = ((float)g)/255.f;
+	S2DE_backColor_b = ((float)b)/255.f;
+	S2DE_backColor_a = ((float)a)/255.f;
+}
+
+void S2DE_setFrontColor(unsigned char r, unsigned char g, unsigned char b, unsigned char a){
+	glColor4f(
 		((float)r)/255.f,
 		((float)g)/255.f,
 		((float)b)/255.f,
-		1.f
-	);
-}
-
-void S2DE_setFrontColor(unsigned char r, unsigned char g, unsigned char b){
-	glColor3f(
-		((float)r)/255.f,
-		((float)g)/255.f,
-		((float)b)/255.f
+		((float)a)/255.f
 	);
 }
 
