@@ -1,0 +1,18 @@
+#!/bin/bash
+
+
+# ---------------- PARAMETERS ----------------
+
+#current execution directory
+CXD=$(dirname $(realpath $0))
+pCXD=$(dirname $CXD)
+
+
+
+
+
+
+# ---------------- EXECUTION ----------------
+
+#main
+zcc $pCXD/src/prog.z $pCXD/cfg/LLI_requirements.cfg

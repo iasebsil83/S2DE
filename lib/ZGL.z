@@ -1,0 +1,577 @@
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ZGL [0.0.1] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                        Z Graphical library
+
+    Based on S2DE :
+            https://github.com/iasebsil83/S2DE
+
+    Developped using freeglut3 (or just GLUT), a graphical 2D/3D engine.
+    To install glut on linux-apt systems, just install the package :
+                               freeglut3-dev
+
+    Contact     : i.a.sebsil83@gmail.com
+    Youtube     : https://www.youtube.com/user/IAsebsil83
+    GitHub repo : https://github.com/iasebsil83
+
+    Let's Code !                                  By I.A.
+*******************************************************************************
+
+    LICENCE :
+
+    ZGL
+    Copyright (C) 2025 Sebastien SILVANO
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library.
+
+    If not, see <https://www.gnu.org/licenses/>.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+
+
+
+
+
+// ---------------- CONSTANTS ----------------
+
+//keyboard constants
+mod ZGL {
+
+	enm KEY_STATE { PRESSED, RELEASED }
+
+	enm KEY {
+
+		//function keys
+		F1          = 0x101,
+		F2          = 0x102,
+		F3          = 0x103,
+		F4          = 0x104,
+		F5          = 0x105,
+		F6          = 0x106,
+		F7          = 0x107,
+		F8          = 0x108,
+		F9          = 0x109,
+		F10         = 0x10a,
+		F11         = 0x10b,
+		F12         = 0x10c,
+
+		//command keys
+		ESCAPE      = 0x01b,
+		END         = 0x16b,
+		HOME        = 0x16a,
+		PAGE_UP     = 0x168,
+		PAGE_DOWN   = 0x169,
+		DELETE      = 0x07f,
+		BACKSPACE   = 0x008,
+		INSERT      = 0x16c,
+
+		//combination keys
+		LEFT_SHIFT  = 0x170,
+		RIGHT_SHIFT = 0x171,
+		LEFT_CTRL   = 0x172,
+		RIGHT_CTRL  = 0x173,
+		LEFT_ALT    = 0x174,
+
+		//special characters
+		BACK_QUOTE  = 0x0b2,
+		AMPERSAND   = 0x026,
+		DBL_QUOTE   = 0x022, //double quote
+		QUOTE       = 0x027,
+		UNDERSCORE  = 0x05f,
+		TAB         = 0x009,
+		CIRCUMFLEX  = 0x05e,
+		DOLLAR      = 0x024,
+		LESS_THAN   = 0x03c, //<
+		GREA_THAN   = 0x03e, //>
+		COMA        = 0x02c,
+		SEMI_COLON  = 0x03b,
+		COLON       = 0x03a,
+		EXCLAMATION = 0x021,
+		SPACE       = 0x020,
+		RETURN      = 0x00d,
+		TILDE       = 0x07e,
+		HASHTAG     = 0x023,
+		PARENTH_B   = 0x028, //parentheses begin
+		PARENTH_E   = 0x029, //            end
+		BRACKETS_B  = 0x05b, //brackets begin
+		BRACKETS_E  = 0x05d, //         end
+		BRACES_B    = 0x07b, //braces begin
+		BRACES_E    = 0x07d, //       end
+		POINT       = 0x02e,
+		PARAGRAPH   = 0x0a7,
+		DEGREE      = 0x0b0,
+		PIPE        = 0x07c,
+		BACKSLASH   = 0x05c,
+		AT          = 0x040,
+		POUND       = 0x0a3,
+		DIERESIS    = 0x0a8,
+		BLOCK       = 0x0a4,
+		ACUTE       = 0x060,
+		MU          = 0x0b5,
+		QUESTION    = 0x03f,
+
+		//numbers & maths
+		ZERO     = 0x030,
+		ONE      = 0x031,
+		TWO      = 0x032,
+		THREE    = 0x033,
+		FOUR     = 0x034,
+		FIVE     = 0x035,
+		SIX      = 0x036,
+		SEVEN    = 0x037,
+		EIGHT    = 0x038,
+		NINE     = 0x039,
+		PLUS     = 0x02b,
+		MINUS    = 0x02d,
+		ASTERISK = 0x02a,
+		SLASH    = 0x02f,
+		EQUAL    = 0x03d,
+		PERCENT  = 0x025,
+
+		//arrows
+		LEFT  = 0x164,
+		UP    = 0x165,
+		RIGHT = 0x166,
+		DOWN  = 0x167,
+
+		//capital letters
+		A = 0x041,
+		B = 0x042,
+		C = 0x043,
+		D = 0x044,
+		E = 0x045,
+		F = 0x046,
+		G = 0x047,
+		H = 0x048,
+		I = 0x049,
+		J = 0x04a,
+		K = 0x04b,
+		L = 0x04c,
+		M = 0x04d,
+		N = 0x04e,
+		O = 0x04f,
+		P = 0x050,
+		Q = 0x051,
+		R = 0x052,
+		S = 0x053,
+		T = 0x054,
+		U = 0x055,
+		V = 0x056,
+		W = 0x057,
+		X = 0x058,
+		Y = 0x059,
+		Z = 0x05a,
+
+		//minimal letters
+		a = 0x061,
+		b = 0x062,
+		c = 0x063,
+		d = 0x064,
+		e = 0x065,
+		f = 0x066,
+		g = 0x067,
+		h = 0x068,
+		i = 0x069,
+		j = 0x06a,
+		k = 0x06b,
+		l = 0x06c,
+		m = 0x06d,
+		n = 0x06e,
+		o = 0x06f,
+		p = 0x070,
+		q = 0x071,
+		r = 0x072,
+		s = 0x073,
+		t = 0x074,
+		u = 0x075,
+		v = 0x076,
+		w = 0x077,
+		x = 0x078,
+		y = 0x079,
+		z = 0x07a,
+
+		//non-ASCII letters
+		A_ACCENT_E = 0x0e9, //acute accentuated E
+		G_ACCENT_E = 0x0e8, //grave accentuated E
+		G_ACCENT_A = 0x0e0, //grave accentuated A
+		G_ACCENT_U = 0x0f9, //grave accentuated U
+		CEDILLA_C  = 0x0e7
+	}
+
+
+
+	//event constants
+	enm EVENT {
+		KEYBOARD,
+		MOUSE_CLICK,
+		MOUSE_MOVE,
+		MOUSE_SCROLL,
+		DISPLAY,
+		RESIZE,
+		TIMER
+	}
+
+
+
+	//mouse constants
+	enm MOUSE_STATE  { PRESSED, RELEASED }
+	enm MOUSE_BUTTON { LEFT=0, MIDDLE=1, RIGHT=2 }
+	enm MOUSE_SCROLL { UP=3, DOWN=4 }
+
+
+
+
+
+
+	// ---------------- INITIALIZATION ----------------
+
+	//window
+	window              = -1l
+	timedExecutionDelay = -1l
+
+	//mouse
+	mouseState  = ^.MOUSE_STATE.PRESSED
+	mouseButton = ^.MOUSE_BUTTON.LEFT
+	mouseScroll = ^.MOUSE_SCROLL_UP
+	unt_g mouseX = 0l
+	unt_g mouseY = 0l
+	cst MOUSE_MOVED_TEMPORIZATION = 1 //in us
+
+	//keyboard
+	keyState = ^.KEY_STATE.PRESSED
+	key      = ^.KEY.ESCAPE
+
+	//resize
+	uint newWidth  = 0
+	uint newHeight = 0
+	uint width     = 0
+	uint height    = 0
+
+
+
+
+
+
+	// ---------------- LOCAL EVENT HANDLERS ----------------
+
+	//timed executions
+	voi local_timedExecution(int i) {
+		if i < 0 { ^.refresh() }
+		els {
+			if timedExecutionDelay >= 0 {
+				glutTimerFunc(
+					(uint)timedExecutionDelay,
+					local_timedExecution,
+					timedExecutionDelay
+				);
+				^.event(^.EVENT.TIMER)
+			}
+		}
+	}
+
+
+
+	//display
+	voi local_display() {
+		glFlush()
+		glClearColor(1.f, 1.f, 1.f, 1.f)
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+		^.event(^.EVENT.DISPLAY)
+		glutSwapBuffers()
+	}
+
+
+
+	//keyboard
+	voi local_keyPressed(GLubyte g, unt_g x, unt_g y) {
+		^.key      = g
+		^.keyState = ^.KEY_STATE.PRESSED
+		^.event(^.EVENT.KEYBOARD)
+	}
+
+	voi local_keyPressed_special(int keyCode, unt_g x, unt_g y) {
+		^.key      = 256 + (ubyt)keyCode
+		^.keyState = ^.KEY_STATE.PRESSED
+		^.event(^.EVENT.KEYBOARD)
+	}
+
+	voi local_keyReleased(GLubyte g, unt_g x, unt_g y) {
+		^.key      = g
+		^.keyState = ^.KEY_STATE.RELEASED
+		^.event(^.EVENT.KEYBOARD)
+	}
+
+	voi local_keyReleased_special(int keyCode, unt_g x, unt_g y) {
+		^.key      = 256 + (ubyt)keyCode
+		^.keyState = ^.KEY_STATE.RELEASED
+		^.event(^.EVENT.KEYBOARD)
+	}
+
+
+
+	//mouse
+	voi local_mouseButton(byt button, byt state, unt_g x, unt_g y) {
+		^.mouseX     = x
+		^.mouseY     = ^.height - y
+		^.mouseState = state
+
+		//scroll
+		if button == ^.MOUSE_SCROLL.UP || button == ^.MOUSE_SCROLL.DOWN {
+			if state == ^.MOUSE_STATE.PRESSED {
+				^.mouseScroll = button
+				^.event(^.EVENT.MOUSE_SCROLL)
+			}
+		}
+
+		//click
+		els{
+			^.mouseButton = button
+			^.event(^.EVENT.MOUSE_CLICK)
+		}
+	}
+
+	voi local_mouseMoved(unt_g x, unt_g y) {
+		^.mouseX = x
+		^.mouseY = ^.height - y
+		usleep(^.MOUSE_MOVED_TEMPORIZATION)
+		if !mouseScroll { ^.event(^.EVENT.MOUSE_MOVE) }
+		els             { ^.mouseScroll = 0           }
+	}
+
+
+
+	//window resize
+	voi local_resize(unt_g width, unt_g height) {
+		glViewport(0,0, width, height)
+		glMatrixMode(GL_PROJECTION)
+		glLoadIdentity()
+		glOrtho(0.f, (GLdouble)width, 0.f, (GLdouble)height, -1.f, 1.f)
+		glMatrixMode(GL_MODELVIEW)
+		^.newWidth  = width
+		^.newHeight = height
+		^.event(^.EVENT.RESIZE)
+		^.width  = width
+		^.height = height
+	}
+
+
+
+
+
+
+	// ---------------- UTILITIES ----------------
+
+	//useful
+	voi refresh() { glutPostRedisplay() }
+
+	voi fullScreen() { glutFullScreen() }
+
+	voi setColor(ubyt r, ubyt v, ubyt b) { glColor3f(r/255.f, v/255.f, b/255.f) }
+
+	voi setThickness(unt_g thickness) { glPointSize(thickness); glLineWidth(thickness) }
+
+
+
+	//graphics
+	voi point(unt_g x, unt_g y) {
+		glBegin(GL_POINTS)
+		glVertex2f(x,y)
+		glEnd()
+	}
+
+	voi line(unt_g x1,unt_g y1, unt_g x2,unt_g y2) {
+		glBegin(GL_LINES)
+		glVertex2f(x1,y1)
+		glVertex2f(x2,y2)
+		glEnd()
+	}
+
+	voi triangle(unt_g x1,unt_g y1, unt_g x2,unt_g y2, unt_g x3,unt_g y3, boo filled) {
+		if filled {
+			glBegin(GL_TRIANGLES)
+			glVertex2f(x1,y1)
+			glVertex2f(x2,y2)
+			glVertex2f(x3,y3)
+			glEnd()
+
+			//GPU weakness : remove diagonals
+			unt_g thickness
+			glGetFloatv(GL_LINE_WIDTH, &thickness)
+			glLineWidth(1.f)
+			line(x1,y1, x2,y2)
+			line(x2,y2, x3,y3)
+			line(x3,y3, x1,y1)
+			glLineWidth(thickness)
+		}els{
+			line(x1,y1, x2,y2)
+			line(x2,y2, x3,y3)
+			line(x3,y3, x1,y1)
+		}
+	}
+
+	voi rectangle(unt_g x1,unt_g y1, unt_g x2,unt_g y2, boo filled) {
+		if filled {
+			glBegin(GL_QUADS)
+			glVertex2f(x1,y1)
+			glVertex2f(x2,y1)
+			glVertex2f(x2,y2)
+			glVertex2f(x1,y2)
+			glEnd()
+
+			//GPU weakness : remove diagonals
+			unt_g thickness
+			glGetFloatv(GL_LINE_WIDTH, &thickness)
+			glLineWidth(1.f)
+			line(x1,y1, x2,y2);
+			glLineWidth(thickness)
+		}els{
+			line(x1,y1, x2,y1)
+			line(x2,y1, x2,y2)
+			line(x2,y2, x1,y2)
+			line(x1,y2, x1,y1)
+		}
+	}
+
+	voi quad(unt_g x1,unt_g y1, unt_g x2,unt_g y2, unt_g x3,unt_g y3, unt_g x4,unt_g y4, boo filled) {
+		if filled {
+			glBegin(GL_QUADS)
+				glVertex2f(x1,y1)
+				glVertex2f(x2,y2)
+				glVertex2f(x3,y3)
+				glVertex2f(x4,y4)
+			glEnd()
+
+			//GPU weakness : remove diagonals
+			unt_g thickness
+			glGetFloatv(GL_LINE_WIDTH, &thickness)
+			glLineWidth(1.f)
+			line(x1,y1, x3,y3)
+			glLineWidth(thickness)
+		}else{
+			line(x1,y1, x2,y2)
+			line(x2,y2, x3,y3)
+			line(x3,y3, x4,y4)
+			line(x4,y4, x1,y1)
+		}
+	}
+
+
+
+	//text
+	voi text(str text, unt_g size, unt_g x,unt_g y) {
+
+		//moving over display (use of the 3rd dimension)
+		glPushMatrix()
+		glTranslatef(x,y,0)
+		glScalef(size,size,size)
+
+		//error case
+		if text == null { ^Err.runtime("Text is NULL."); ret }
+
+		//write text character per character
+		for c ovr text { glutStrokeCharacter(GLUT_STROKE_ROMAN, c) }
+		glPopMatrix()
+	}
+
+
+
+	//images
+	voi imageRGBA(int x,int y, int width,int height, int* data){
+		glRasterPos2i(x,y)
+		glDrawPixels(width,height, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, data)
+	}
+
+	int setPixelRGBA(ubyt r, ubyt g, ubyt b, ubyt a) { ret r<<`18 + g<<`10 + b<<`08 + a }
+
+
+
+	//timed executions
+	voi setTimer(int ms) {
+		if timedExecutionDelay < 0 && ms >= 0 {
+			glutTimerFunc(
+				(uint)ms,
+				S2DEL_timedExecution,
+				ms
+			)
+		}
+
+		//set new timedExecution delay
+		timedExecutionDelay = ms
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+	// ---------------- BASICS -----------------
+
+	//init
+	voi init(str name, uint width, uint height) {
+
+		//error case
+		if name == null { ^Err.runtime("Cannot init window, no name given."); ret }
+
+		//init attributes
+		^.width  = width
+		^.height = height
+
+		//init window
+		glutInit() //&argc, argv)
+		glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH)
+		glutInitWindowPosition(0,0)
+		glutInitWindowSize(width, height)
+		^.window = glutCreateWindow(name)
+
+		//some settings
+		glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST)
+		glDepthFunc(GL_LEQUAL)
+		glShadeModel(GL_SMOOTH)
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+		glEnable(GL_BLEND)
+		glHint(GL_POINT_SMOOTH_HINT, GL_NICEST)
+		glHint(GL_LINE_SMOOTH_HINT, GL_NICEST)
+		glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST)
+		glEnable(GL_POINT_SMOOTH)
+		glEnable(GL_LINE_SMOOTH)
+		glEnable(GL_POLYGON_SMOOTH)
+		glEnable(GL_NORMALIZE)
+		glutSetKeyRepeat(GLUT_KEY_REPEAT_OFF)
+		glPointSize(2.f)
+
+		//set local event handlers
+		glutDisplayFunc(      local_display            )
+		glutKeyboardFunc(     local_keyPressed         )
+		glutSpecialFunc(      local_keyPressed_special )
+		glutKeyboardUpFunc(   local_keyReleased        )
+		glutSpecialUpFunc(    local_keyReleased_special)
+		glutMouseFunc(        local_mouseButton        )
+		glutMotionFunc(       local_mouseMoved         )
+		glutPassiveMotionFunc(local_mouseMoved         )
+		glutReshapeFunc(      local_resize             )
+	}
+
+
+
+	//start - stop
+	voi start() { glutMainLoop() }
+
+	voi stop() {
+		glutDestroyWindow(^.window)
+		^Err.exit(Err.SUCCESS)
+	}

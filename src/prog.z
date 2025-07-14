@@ -1,0 +1,139 @@
+// ---------------- IMPORTATIONS ----------------
+
+//standard
+<stdz>
+
+
+
+//graphics
+imp ../lib/ZGL //2D motor
+
+
+
+
+
+
+// ---------------- PARAMETERS ----------------
+
+//window
+cst WIDTH         = 700l
+cst HEIGHT        = 700l
+cst REFRESH_DELAY = 100 //in ms
+
+
+
+
+
+
+// ---------------- EXECUTION ----------------
+
+//events
+voi ^ZGL.event(int event) {
+	swi event {
+
+		//display
+		^ZGL.EVENT.DISPLAY {
+
+			//background
+			^ZGL.setColor(255,255,255)
+			^ZGL.rectangle(0,0, ^ZGL.width,^ZGL.height, true)
+
+			//blue filled rectangle at the bottom left corner
+			^ZGL.setColor(  0,  0,255)
+			^ZGL.rectangle(100,100, 200,200, true)
+
+			//red unfilled rectangle at the top right corner
+			^ZGL.setColor(255,  0,  0)
+			^ZGL.rectangle(
+				^ZGL.width-100l, ^ZGL.height-100l,
+				^ZGL.width-200l, ^ZGL.height-200l,
+				true
+			)
+		},
+
+
+
+		//keyboard
+		^ZGL.EVENT.KEYBOARD {
+
+			//state
+			if ^ZGL.keyState == ^ZGL.KEY_STATE.PRESSED { ^IO.print("KEY_PRESSED : ")  }
+			els                                        { ^IO.print("KEY_RELEASED : ") }
+
+			//key
+			swi ^ZGL.key {
+				^ZGL.KEY.ESCAPE { exit(^Err.SUCCESS)         },
+				^ZGL.KEY.LEFT   { ^IO.printLF("Left arrow")  },
+				^ZGL.KEY.UP     { ^IO.printLF("Up arrow")    },
+				^ZGL.KEY.RIGHT  { ^IO.printLF("Right arrow") },
+				^ZGL.KEY.DOWN   { ^IO.printLF("Down arrow")  },
+				def             { ^IO.printLF("<other>")     }
+			}
+		},
+
+
+
+		//mouse
+		^ZGL.EVENT.MOUSE_CLICK {
+
+			//state
+			if ^ZGL.mouseState == ^ZGL.MOUSE_STATE.PRESSED { ^IO.print("MOUSE_PRESSED : ")  }
+			els                                            { ^IO.print("MOUSE_RELEASED : ") }
+
+			//button
+			swi ^ZGL.mouseButton {
+				^ZGL.MOUSE_BUTTON.LEFT   { ^IO.printLF("Left button at ("  + ^ZGL.mouseX.toStr() + ',' + ^ZGL.mouseY.toStr() + ')') },
+				^ZGL.MOUSE_BUTTON.MIDDLE { ^IO.printLF("Middle button ("   + ^ZGL.mouseX.toStr() + ',' + ^ZGL.mouseY.toStr() + ')') },
+				^ZGL.MOUSE_BUTTON.RIGHT  { ^IO.printLF("Right button at (" + ^ZGL.mouseX.toStr() + ',' + ^ZGL.mouseY.toStr() + ')') }
+			}
+		},
+
+
+
+		//mouse scroll
+		^ZGL.EVENT.MOUSE_SCROLL {
+			swi ^ZGL.mouseScroll {
+				^ZGL.MOUSE_SCROLL.UP   { ^IO.printLF("Scrolling up at ("   + ^ZGL.mouseX.toStr() + ',' + ^ZGL.mouseY.toStr() + ')') },
+				^ZGL.MOUSE_SCROLL.DOWN { ^IO.printLF("Scrolling down at (" + ^ZGL.mouseX.toStr() + ',' + ^ZGL.mouseY.toStr() + ')') }
+			}
+		},
+
+
+
+		//mouse move
+		^ZGL.EVENT.MOUSE_MOVE {
+			^IO.printLF("Mouse is moving passively to (" + ^ZGL.mouseX.toStr() + ',' + ^ZGL.mouseY.toStr() + ')')
+		},
+
+
+
+		//timed execution
+		^ZGL.TIMER {
+			^ZGL.refresh()
+		},
+
+
+
+		//resize
+		^ZGL.EVENT.RESIZE {
+			^IO.printLF("Reshaping window to " + ^ZGL.newWidth.toStr() + ',' + ^ZGL.newHeight + ')')
+		}
+	}
+}
+
+
+
+//main
+byt main(tab[str] args) {
+
+	//init ZGL
+	^ZGL.init("Program Name [V.V.V]", WIDTH, HEIGHT)
+	^ZGL.setTimer(REFRESH_DELAY)
+
+	//launch ZGL
+	^IO.printLF("Starting ZGL [0.0.1]")
+	^ZGL.start()
+
+	//exit
+	ret ^Err.SUCCESS
+}
