@@ -6,8 +6,6 @@
 
 
 
-
-
 // ---------------- DECLARATIONS ----------------
 
 //keyboard constants
@@ -203,8 +201,6 @@ enum S2DE_EVENTS{
 
 
 
-
-
 // ---------------- UTILITIES ----------------
 
 //useful
@@ -235,8 +231,6 @@ void S2DE_setTimer(int ms);
 
 
 
-
-
 // ---------------- BASICS -----------------
 
 //init
@@ -245,12 +239,5 @@ void S2DE_init(int argc, char** argv, const char* name, unsigned int width,unsig
 //start - stop
 void S2DE_start();
 void S2DE_stop();
-
-
-
-
-
-
-
 
 #endif

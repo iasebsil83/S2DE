@@ -4,16 +4,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-
-
 //graphics
 #include "../lib/S2DE.h" //2D motor
-
-
-
-
-
-
 
 
 
@@ -25,27 +17,8 @@
 
     Blablabla about the project.
 
-    DD/MM/YYYY > [V.V.V] :
-    - Added something.
-    - Added something else.
-
-    DD/MM/YYYY > [V.V.V] :
-        - Added something that wasn't before.
-        - Fixed a bug.
-        - Added something else.
-        - Added something else again.
-
-    BUGS : Active bugs in last version
-    NOTES : Notes
-
-    Contact : ...
+    Contact: .
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-
-
-
-
-
-
 
 
 
@@ -72,15 +45,9 @@ extern unsigned int S2DE_height;
 
 
 
-
-
-
-
-
-
 // ---------------- EXECUTION ----------------
 
-// ---- events ----
+//events
 void S2DE_event(int event){
 	switch(event){
 
@@ -196,7 +163,7 @@ void S2DE_event(int event){
 
 
 
-// ---- main ----
+//main
 int main(int argc, char** argv){
 
 	//init S2DE

@@ -5,8 +5,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-
-
 //graphic engine
 #ifdef __APPLE__
 	#include <GLUT/glut.h>
@@ -14,16 +12,8 @@
 	#include <glut.h>
 #endif
 
-
-
 //own header
 #include "S2DE.h"
-
-
-
-
-
-
 
 
 
@@ -54,48 +44,7 @@
     This library was inspired by Ghislain OUDINET's GfxLib (coded in C,
     using GLUT) and Processing 3 (for codes in Java).
 
-    16/07/2020 > [0.1.0] :
-    - Creating the whole engine (functions, constants and default program).
-
-    31/07/2020 > [0.1.1] :
-    - Added S2DE_imageRGBA() (data must be in RGBA format, 4 bytes per pixel).
-    - Added S2DE_setPixelRGBA(). Useful to create images manually.
-
-    03/08/2020 > [0.1.2] :
-    - Added error messages in S2DE_text() and S2DE_init().
-
-    10/09/2020 > [0.1.3] :
-    - Changed event handling system : Passed from one function per event type
-      to only one function with event id.
-    - Remapped all keyboard keys.
-    - Added detection of released events.
-    - Removed unecessary libraries.
-
-    22/11/2020 > [0.1.4] :
-    - Fixed bug : diagonals appeared in rectangles and quads.
-
-    08/12/2020 > [0.1.5] :
-    - Fixed bug : Mouse Y coordinate is inverted.
-    - Added external variables S2DE_width & S2DE_height.
-    - Modified S2DEL_reshape() :
-      Now, S2DE_newWidth & S2DE_newHeight are set before
-      S2DE_RESHAPE event, and then
-      S2DE_width & S2DE_height are set.
-
-    22/03/2021 > [0.1.6] :
-    - Added S2DE_MOUSE_SCROLL event.
-
-    BUGS : .
-    NOTES : S2DE is now compatible with another library I made
-    for PNG image manipulation : PNG.c/.h.
-    It is available here :
-            https://github.com/iasebsil83/C_PNG
-    Use S2DE_imageRGBA() to draw image on screen.
-
-
-    Contact     : i.a.sebsil83@gmail.com
-    Youtube     : https://www.youtube.com/user/IAsebsil83
-    GitHub repo : https://github.com/iasebsil83
+    Contact: https://github.com/iasebsil83
 
     Let's Code !                                  By I.A.
 ******************************************************************************************
@@ -126,19 +75,11 @@
 
 
 
-
-
-
-
-
-
 // ---------------- INITIALISATION ----------------
 
 //window
 static int S2DE_window               = -1;
 static int S2DE_timedExecution_delay = -1;
-
-
 
 //event variables
 int S2DE_mouseState         = 0; //mouse
@@ -153,16 +94,8 @@ unsigned int S2DE_newHeight = 0;
 unsigned int S2DE_width     = 0;
 unsigned int S2DE_height    = 0;
 
-
-
 //event handler
 extern void S2DE_event(int event);
-
-
-
-
-
-
 
 
 
@@ -271,12 +204,6 @@ static void S2DEL_reshape(int width,int height){
 	S2DE_width  = width;
 	S2DE_height = height;
 }
-
-
-
-
-
-
 
 
 
@@ -436,12 +363,6 @@ void S2DE_setTimer(int ms){
 	//set new timedExecution delay
 	S2DE_timedExecution_delay = ms;
 }
-
-
-
-
-
-
 
 
 
