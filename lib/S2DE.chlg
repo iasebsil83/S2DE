@@ -1,10 +1,6 @@
 CURRENT STATE:
     BUGS: .
-    NOTES: S2DE is now compatible with another library I made
-        for PNG image manipulation : PNG.c/.h.
-        It is available here :
-                https://github.com/iasebsil83/C_PNG
-        Use S2DE_imageRGBA() to draw image on screen.
+    NOTES: .
 
 
 

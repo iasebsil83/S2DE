@@ -41,6 +41,12 @@
     needs some more precise graphical configurations and you are not afraid
     about lots of settings, you should rather use the original GLUT functions.
 
+        S2DE is now compatible with another library I made for PNG image
+    manipulation : PNG.c/.h.
+    It is available here :
+            https://github.com/iasebsil83/C_PNG
+    Use S2DE_imageRGBA() to draw image on screen.
+
     This library was inspired by Ghislain OUDINET's GfxLib (coded in C,
     using GLUT) and Processing 3 (for codes in Java).
 
